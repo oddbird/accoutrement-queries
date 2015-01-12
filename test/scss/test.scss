@@ -1,8 +1,167 @@
 // Scale Tests
 // ===========
+// @@@ needs True update for at() & _render-query() mixin tests
 
 @import '../../node_modules/sass-true/sass/true';
 @import '../../sass/queries';
+
+
+$queries: (
+  number: 20em,
+  map: (
+    media: screen,
+    max-width: 30em
+  ),
+  string: 'screen and (orientation: landscape)',
+  numbers: 80em 60em,
+  pair: min-height 40em,
+  combo: (
+    media: 'screen and (color)',
+    min-width: 30em,
+  ),
+  tablet: numbers,
+);
+
+
+// at [function]
+@include test-module('at [function]') {
+  @include test('Return the current media-query context') {
+    @include assert-false(at(),
+      'Returns false when there is no context');
+
+    $query-context: (name: tablet) !global;
+
+    @include assert-equal(at(), $query-context,
+      'Returns current value of query-context');
+  }
+
+  @include test('Return one property from the current context') {
+    @include assert-equal(at(name), tablet,
+      'Returns a given property from the current context.');
+  }
+
+  $query-context: () !global;
+}
+
+
+// render query [function]
+@include test-module('_render-query [function]') {
+  @include test('Create a printable media-query string from a map') {
+    $test: map-get($queries, map);
+    $test: _render-query($test);
+    $expect: 'screen and (max-width: 30em)';
+
+    @include assert-equal($test, $expect,
+      'Converts a map of queries into an and-delimited string');
+  }
+}
+
+
+// update query context [mixin]
+@include test-module('_update-query-context [mixin]') {
+  @include test('Set a new media-query context') {
+    $expect: ();
+
+    @include assert-equal($query-context, $expect,
+      'Establish that there is currently no context.');
+
+    $new: (media: screen);
+
+    @include _update-query-context($new, George);
+
+    $test: map-get($query-context, media);
+    @include assert-equal($test, screen,
+      'Sets a new media-query context.');
+
+    $test: map-get($query-context, name);
+    @include assert-equal($test, George,
+      'Sets a new media-query context name.');
+  }
+
+  @include test('Update an existing media-qury context') {
+    $new: (min-width: 30em);
+    $expect: (
+      name: George,
+      media: screen,
+      min-width: 30em,
+    );
+
+    @include _update-query-context($new);
+
+    @include assert-equal($query-context, $expect,
+      'Updates an existing media-query context.');
+  }
+
+  @include test('Override an existing media context') {
+    $new: (max-width: 80em);
+
+    @include _update-query-context($new, $clean: true);
+
+    @include assert-equal($query-context, $new,
+      'Overrides an existing media-query context with "clean"');
+  }
+}
+
+
+// get query [function]
+@include test-module('_get-query [function]') {
+  @include test('Find a named media-query') {
+    @include assert-equal(_get-query(tablet), map-get($queries, numbers),
+      'Returns a named media-query from $queries.');
+  }
+
+  @include test('Allow for new queries') {
+    @include assert-equal(_get-query(monkey), monkey,
+      'Returns input when no match is found.');
+  }
+}
+
+
+// parse media-query [function]
+@include test-module('_parse-media-query [function]') {
+  @include test('Parse a map') {
+    $test: _parse-media-query(map-get($queries, map));
+    $expect: map-get($queries, map);
+
+    @include assert-equal($test, $expect,
+      'Returns a map directly without any changes');
+  }
+
+  @include test('Parse a number') {
+    $test: _parse-media-query(map-get($queries, number));
+    $expect: (min-width: 20em);
+
+    @include assert-equal($test, $expect,
+      'Turn a single number into a min-width query.');
+  }
+
+  @include test('Parse a list of numbers') {
+    $test: _parse-media-query(map-get($queries, numbers));
+    $expect: (
+      min-width: 60em,
+      max-width: 80em,
+    );
+
+    @include assert-equal($test, $expect,
+      'Turn two numbers into a min/max query.');
+  }
+
+  @include test('Parse a property/value pair') {
+    $test: _parse-media-query(map-get($queries, pair));
+    $expect: (min-height: 40em);
+
+    @include assert-equal($test, $expect,
+      'Return a peroperty/value pair from a list pair.');
+  }
+
+  @include test('Parse a string') {
+    $test: _parse-media-query(map-get($queries, string));
+    $expect: (media: 'screen and (orientation: landscape)');
+
+    @include assert-equal($test, $expect,
+      'Return a string under the "media" key.');
+  }
+}
 
 
 @include report;
