@@ -1,6 +1,6 @@
 {
   "name": "accoutrement-queries",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Sass string utilities.",
   "homepage": "https://github.com/oddbird/accoutrement-queries",
   "repository": {
@@ -8,6 +8,7 @@
     "url": "git://github.com/oddbird/accoutrement-queries.git"
   },
   "devDependencies": {
+    "accoutrement-scale": "^1.0.6",
     "mocha": "^2.1.0",
     "sass-true": "^2.0.0-beta.1"
   },

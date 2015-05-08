@@ -114,6 +114,11 @@ $query-context: ();
   @if map-has-key($queries, $name) {
     $name: map-get($queries, $name);
     $name: _get-query($name);
+  } @else if variable-exists(sizes)
+    and function-exists(root-size)
+    and map-has-key($sizes, $name) {
+    $name: map-get($sizes, $name);
+    $name: root-size($name);
   }
 
   @return $name;

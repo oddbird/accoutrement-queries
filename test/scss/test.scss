@@ -1,8 +1,8 @@
 // Scale Tests
 // ===========
-// @@@ needs True update for at() & _render-query() mixin tests
 
 @import '../../node_modules/sass-true/sass/true';
+@import '../../node_modules/accoutrement-scale/sass/scale';
 @import '../../sass/queries';
 
 
@@ -20,6 +20,10 @@ $queries: (
     min-width: 30em,
   ),
   tablet: numbers,
+);
+
+$sizes: (
+  page: 30rem,
 );
 
 
@@ -113,6 +117,11 @@ $queries: (
   @include test('Allow for new queries') {
     @include assert-equal(_get-query(monkey), monkey,
       'Returns input when no match is found.');
+  }
+
+  @include test('Use size names for queries') {
+    @include assert-equal(_get-query(page), 30em,
+      'Returns $size value if available.');
   }
 }
 
