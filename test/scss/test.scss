@@ -1,5 +1,6 @@
 // Scale Tests
 // ===========
+// @@@ True can't yet test media-query output...
 
 @import '../../node_modules/sass-true/sass/true';
 @import '../../node_modules/accoutrement-scale/sass/scale';
@@ -25,6 +26,37 @@ $queries: (
 $sizes: (
   page: 30rem,
 );
+
+$breakpoints: (
+  alias: page,
+  sidebar: 40em,
+  meta: sidebar,
+  inception: alias,
+);
+
+
+// break [function]
+@include test-module('break [function]') {
+  @include test('Access breakpoints map') {
+    @include assert-equal(break(sidebar), map-get($breakpoints, sidebar),
+      'Returns a breakpoint value based on keyword');
+  }
+
+  @include test('Self-reference in breakpoints map') {
+    @include assert-equal(break(meta), map-get($breakpoints, sidebar),
+      'Returns a breakpoint value based on referenced keywords');
+  }
+
+  @include test('Access sizes map') {
+    @include assert-equal(break(page), root-size(map-get($sizes, page)),
+      'Returns a breakpoint value based on sizes keyword');
+  }
+
+  @include test('OMG map inception') {
+    @include assert-equal(break(inception), root-size(map-get($sizes, page)),
+      'Returns a breakpoint value based on multiple cross-map references');
+  }
+}
 
 
 // at [function]

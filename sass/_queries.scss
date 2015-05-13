@@ -1,8 +1,71 @@
 // Accoutrement Queries
 // ====================
 
-$queries: () !default;
 $query-context: ();
+
+$queries: () !default;
+$breakpoints: () !default;
+
+
+// Break [function]
+// ----------------
+
+@function break(
+  $point
+) {
+  // Parse arguments
+  $point: map-get($breakpoints, $point) or map-get($sizes, $point) or $point;
+
+  // Recursive check
+  $point: if(type-of($point) != 'number', break($point), $point);
+
+  // Fix rem units
+  @if unit($point) == rem {
+    $point: root-size($point);
+  }
+
+  @return $point;
+}
+
+
+// Below [mixin]
+// -------------
+
+@mixin below(
+  $max,
+  $prop: width
+) {
+  @media (max-#{$prop}: #{break($max)}) {
+    @content;
+  }
+}
+
+
+// Above [mixin]
+// -------------
+
+@mixin above(
+  $min,
+  $prop: width
+) {
+  @media (min-#{$prop}: #{break($min)}) {
+    @content;
+  }
+}
+
+
+// Between [mixin]
+// ---------------
+
+@mixin between(
+  $min,
+  $max,
+  $prop: width
+) {
+  @media (min-#{$prop}: #{break($min)}) and (max-#{$prop}: #{break($max)}) {
+    @content;
+  }
+}
 
 
 // At [mixin]
